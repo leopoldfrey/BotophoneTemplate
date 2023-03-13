@@ -9,6 +9,8 @@ import openai
 openai.api_key = "INSERT_YOUR_API_KEYHERE"
 # get an API key here : https://platform.openai.com/account/api-keys
 
+botophoneIP = "192.168.1.66"
+
 class BotoBrain:
     # initialisation de la classe
     def __init__(self):
@@ -19,7 +21,7 @@ class BotoBrain:
         s.close()
 
         self.osc_server = Server(self.ip, 14001, self.oscIn)
-        self.osc_client = Client("127.0.0.1", 14000) #"192.168.1.66"
+        self.osc_client = Client(botophoneIP, 14000)
         self.osc_client.send("/ip", self.ip)
 
         # ICI VOUS POUVEZ INITIALISER VOS VARIABLES ET CHARGER LE MODELE

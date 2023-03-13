@@ -3,6 +3,8 @@ from pyosc import Client, Server
 import os, signal, functools, socket
 print = functools.partial(print, end='\n',flush=True)
 
+botophoneIP = "192.168.1.66"
+
 class BotoBrain:
     # initialisation de la classe
     def __init__(self):
@@ -13,7 +15,7 @@ class BotoBrain:
         s.close()
 
         self.osc_server = Server(self.ip, 14001, self.oscIn)
-        self.osc_client = Client("127.0.0.1", 14000) #"192.168.1.66"
+        self.osc_client = Client(botophoneIP, 14000)
         self.osc_client.send("/ip", self.ip)
 
         # ICI VOUS POUVEZ INITIALISER VOS VARIABLES ET CHARGER LE MODELE
