@@ -5,6 +5,8 @@ Communication via OSC.
 
 <code>pip install python_osc</code>
 
-pour utiliser l'exemple avec chatgpt, il faut installer openai et une clé de l'API open ai (disponible ici : https://platform.openai.com/account/api-keys, nombre de requêtes gratuites limitées)
+Voir les commentaires dans le code.
+
+Pour utiliser l'exemple avec chatgpt, il faut installer openai et une clé de l'API open ai (disponible ici : https://platform.openai.com/account/api-keys, nombre de requêtes gratuites limitées)
 
 <code>pip install openai</code>
