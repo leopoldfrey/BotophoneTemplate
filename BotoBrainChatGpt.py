@@ -3,12 +3,17 @@ from pyosc import Client, Server
 import os, signal, functools, socket
 print = functools.partial(print, end='\n',flush=True)
 
+from os import environ
 import openai
-# Apply the API Key
-openai.api_key = "INSERT_YOUR_API_KEYHERE"
-# get an API key here : https://platform.openai.com/account/api-keys
+from dotenv import load_dotenv
+
+load_dotenv()
+openai.api_key = environ.get("GPTKEY")
 
 botophoneIP = "192.168.1.66"
+
+system_prompt = "Je souhaite que nous discutions. Tu dois incarner Gilles Deleuze. Tu répondras toujours dans le style de Deleuze. Tu citeras directement Deleuze dès que possible, a la première personne. Tu commenceras toutes tes phrases par une question et termineras par une question. Ta première phrase sera 'Bonjour, je suis le fantôme de Gilles Deleuze, comment puis-je vous renseigner ?'"
+MESSAGES = [{"role": "system", "content": system_prompt}]
 
 class BotoBrain:
     # initialisation de la classe
@@ -30,30 +35,42 @@ class BotoBrain:
     # initalisation de conversation déclenché par le controleur principal (quand on décroche le téléphone)
     def newConversation(self):
         # MODIFIER ICI POUR REINITIALISER LA CONVERSATION
+        print("new conversation")
         pass
 
     # première phrase du bot, c'est lui qui lance la conversation
     def speakStart(self):
         # MODIFIER LA (ou les) PREMIERE PHRASE
-        reponse = "Bonjour"
-        self.osc_client.send('/lastresponse',reponse)
+        # reponse = "Bonjour"
+        # print(reponse)
+        completion = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": system_prompt}]
+        )
+        message = completion['choices'][0]['message']['content']
+        print(message)
+
+        self.osc_client.send('/lastresponse', message)
 
     # fin de conversation déclenchée par le controleur principal (temps max ou nombre d'interactions max)
     def endConversation(self, phrase):
         # MODIFIER LA (ou les) PHRASE DE FIN
         reponse = "Au revoir et à bientôt"
+        print(reponse)
         self.osc_client.send('/end',reponse)
 
     # phrase(s) de relance quand silence trop long
     def relance(self):
         # MODIFIER LA (ou les) PHRASE DE RELANCE
         reponse = "Parlons d'autre chose"
+        print(reponse)
         self.osc_client.send('/lastresponse', reponse)
 
     # phrase(s) que dit le bot quand il perd l'utilisateur
     def areYouThere(self):
         # MODIFIER LA (ou les) PHRASE DE RELANCE
         reponse = "Êtes-vous toujours là ?"
+        print(reponse)
         self.osc_client.send('/lastresponse', reponse)
 
     # c'est ici qu'il faut insérer le BOT, string "phrase" en entrée
@@ -71,22 +88,18 @@ class BotoBrain:
 
     # Generate a response using OpenAI GPT-3
     def generate_response(self, prompt):
-        # completions = openai.Completion.create(
-        #     engine="text-davinci-002",
-        #     prompt=prompt,
-        #     max_tokens=200,
-        #     n=1,
-        #     stop=None,
-        #     temperature=0.5,
-        # )
-
+        print(prompt)
+        MESSAGES.append({"role": "user", "content": prompt})
         completion = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}]
+            messages=MESSAGES
         )
+        message = completion['choices'][0]['message']
+        MESSAGES.append(message)
 
-        message = completion['choices'][0]['message']['content']
-        return message
+        message_content = message['content']
+        print(message_content)
+        return message_content
 
 
 # NE PAS MODIFIER SOUS CETTE LIGNE
